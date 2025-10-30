@@ -1,3 +1,9 @@
 [submodule "cloudethix_git_vishal"]
 	path = cloudethix_git_vishal
 	url = https://github.com/bobhatevishal/cloudethix_git_vishal.git
+[submodule "free-for-dev"]
+	path = free-for-dev
+	url = https://github.com/bobhatevishal/free-for-dev.git
+[submodule "merge_confilct_demo"]
+	path = merge_confilct_demo
+	url = https://github.com/bobhatevishal/merge_confilct_demo.git
