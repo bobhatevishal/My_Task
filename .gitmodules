@@ -7,3 +7,12 @@
 [submodule "merge_confilct_demo"]
 	path = merge_confilct_demo
 	url = https://github.com/bobhatevishal/merge_confilct_demo.git
+[submodule "GIT_TASKS/cloudethix_git_vishal"]
+	path = GIT_TASKS/cloudethix_git_vishal
+	url = https://github.com/bobhatevishal/cloudethix_git_vishal.git
+[submodule "GIT_TASKS/merge_confilct_demo"]
+	path = GIT_TASKS/merge_confilct_demo
+	url = https://github.com/bobhatevishal/merge_confilct_demo.git
+[submodule "GIT_TASKS/free-for-dev"]
+	path = GIT_TASKS/free-for-dev
+	url = https://github.com/bobhatevishal/free-for-dev.git
