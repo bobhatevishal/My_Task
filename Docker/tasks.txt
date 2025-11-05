@@ -1,0 +1,251 @@
+
+1. Docker Installation
+==========================================================================================================================================================
+
+[root@host01 Docker]# yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
+[root@host01 Docker]# yum install -y yum-utils device-mapper-persistent-data lvm2
+[root@host01 Docker]# yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+[root@host01 Docker]# yum list docker-ce --showduplicates | sort -r
+[root@host01 Docker]# yum update -y
+[root@host01 Docker]# yum install -y docker-ce docker-ce-cli containerd.io
+[root@host01 Docker]# systemctl start docker
+[root@host01 Docker]# systemctl enable docker
+[root@host01 Docker]# docker --version
+Docker version 26.1.3, build 9c4c2dd
+[root@host01 Docker]# docker info
+
+
+Docker successfully installed and verified.
+
+=====================================================================================================================================
+
+2. Working with Docker Images
+
+
+[root@host01 Docker]# docker search ubuntu
+[root@host01 Docker]# docker pull ubuntu:latest
+[root@host01 Docker]# docker images
+
+
+Pulled official Ubuntu image and confirmed in image list.
+
+=======================================================================================================================================
+
+3. Creating a Docker Container
+
+
+[root@host01 Docker]# docker container run -it ubuntu:latest /bin/bash
+root@a2c4e8c4b1d1:/# echo "Hello, Docker!"
+Hello, Docker!
+root@a2c4e8c4b1d1:/# exit
+exit
+
+
+Container executed and exited successfully.
+
+==========================================================================================================================================
+
+4. Inspect Container (Created State)
+
+
+[root@host01 Docker]# docker ps -a
+CONTAINER ID   IMAGE           COMMAND       STATUS         NAMES
+a2c4e8c4b1d1   ubuntu:latest   "/bin/bash"   Created        ubuntu_test
+
+
+Container in Created state verified.
+
+============================================================================================================================================
+
+5. Run Container (Running State)
+
+
+[root@host01 Docker]# docker container start ubuntu_test
+[root@host01 Docker]# docker ps
+CONTAINER ID   IMAGE           STATUS         NAMES
+a2c4e8c4b1d1   ubuntu:latest   Up 10 seconds  ubuntu_test
+
+
+Container now in Running state.
+
+=============================================================================================================================================
+
+6. Launch and Remove HTTP Container
+
+
+[root@host01 Docker]# docker run -d --name web1 httpd
+[root@host01 Docker]# docker ps
+CONTAINER ID   IMAGE     STATUS         PORTS   NAMES
+084388011ebc   httpd     Up 4 seconds           web1
+[root@host01 Docker]# docker container stop web1
+[root@host01 Docker]# docker container rm web1
+[root@host01 Docker]# docker rmi httpd
+
+
+HTTP container removed with image cleanup.
+
+
+=================================================================================================================================================
+
+7. List Short Container IDs
+
+
+[root@host01 Docker]# docker ps -aq
+a2c4e8c4b1d1
+084388011ebc
+
+
+Displayed short container IDs only.
+
+
+==============================================================================================================================================
+8. Clone & Build Custom Image
+
+
+[root@host01 Docker]# git clone https://github.com/lancachenet/ubuntu-nginx.git
+[root@host01 Docker]# cd ubuntu-nginx
+[root@host01 ubuntu-nginx]# docker build -t ubuntu-nginx:v1 .
+
+
+Image built successfully with tag ubuntu-nginx:v1.
+
+
+=============================================================================================================================================
+9. Run & Test the Webpage
+
+
+[root@host01 ubuntu-nginx]# docker run -d --name webpage -p 80:80 ubuntu-nginx:v1
+[root@host01 ubuntu-nginx]# curl localhost 
+Welcome to nginx
+
+Webpage accessible successfully.
+
+=================================================================================================================================================
+10. Container Detach & Reattach
+
+
+[root@host01 Docker]# docker run -it --name ubuntu-detach ubuntu /bin/bash
+root@c9b2288cf2f0:/# (Press Ctrl+P+Q to detach)
+[detached from container c9b2288cf2f0]
+[root@host01 Docker]# docker ps
+CONTAINER ID   IMAGE     STATUS       NAMES
+c9b2288cf2f0   ubuntu    Up 5 mins    ubuntu-detach
+[root@host01 Docker]# docker attach ubuntu-detach
+root@c9b2288cf2f0:/# hostname -I
+172.17.0.2
+
+
+Detach and reattach confirmed, IP address retrieved.
+
+==================================================================================================================================================
+
+12. Inspect Host Configuration
+
+
+[root@host01 Docker]# docker exec -it webpage hostname
+084388011ebc
+[root@host01 Docker]# docker exec -it webpage cat /etc/hosts
+127.0.0.1   localhost
+172.17.0.3  webpage
+
+
+Hostname and /etc/hosts verified.
+
+==================================================================================================================================================
+
+13. Monitor Container Stats
+
+
+[root@host01 Docker]# docker stats webpage
+CONTAINER ID   NAME      CPU %   MEM USAGE   NET I/O   BLOCK I/O
+084388011ebc   webpage   0.15%   10.5MiB     1.2kB     0B
+[root@host01 Docker]# docker top webpage
+PID   USER   TIME   COMMAND
+1     root   0:00   nginx: master process
+8     www    0:00   nginx: worker process
+
+
+Resource usage monitored successfully.
+
+=============================================================================================================================================
+
+14. Nginx Containers Log Review
+
+
+[root@host01 Docker]# docker run -d --name nginx1 nginx
+[root@host01 Docker]# docker run -d --name nginx2 nginx
+[root@host01 Docker]# docker logs nginx1
+[root@host01 Docker]# docker logs nginx2
+
+
+Logs from both containers reviewed and compared.\
+
+=======================================================================================================================================================
+
+
+15. System Events & Filters
+
+
+[root@host01 Docker]# docker events --since 30m --filter "event=start" --filter "container=web1"
+2025-11-05T05:24:09.333687774-05:00 container start 084388011ebc6d1d05b4df1e2461e59dcc2b5881abd5bfefb77292efd3883b03 (image=nginx, maintainer=NGINX Docker Maintainers <docker-maint@nginx.com>, name=web1)
+^C
+[root@host01 Docker]#
+
+
+Event filtering successfully tested for container activity.
+
+================================================================================================================================
+
+16. Custom Hostname & Logs
+
+
+[root@host01 Docker]# docker run -it --name mycompant_name --hostname cloudethix.com ubuntu /bin/bash
+root@cloudethix:/# exit
+exit
+[root@host01 Docker]# docker inspect mycompant_name --format='{{.State.ExitCode}}'
+0
+[root@host01 Docker]# docker logs mycompant_name
+[root@host01 Docker]# docker container stop mycompant_name
+[root@host01 Docker]# docker container kill mycompant_name
+
+
+Hostname set as cloudethix.com, logs and exit code verified.
+
+
+================================================================================================================================
+17. Container Management Operations
+
+
+[root@host01 Docker]# docker container run -dit --name random ubuntu
+[root@host01 Docker]# docker container rename random Ubuntu01
+[root@host01 Docker]# docker container run -dit --name Ubuntu02 ubuntu
+[root@host01 Docker]# docker exec -it Ubuntu01 hostname
+Ubuntu01
+[root@host01 Docker]# docker exec -it Ubuntu02 hostname
+Ubuntu02
+[root@host01 Docker]# docker container pause Ubuntu02
+[root@host01 Docker]# docker container unpause Ubuntu02
+[root@host01 Docker]# docker container stop Ubuntu01
+[root@host01 Docker]# docker container start Ubuntu01
+[root@host01 Docker]# docker container restart Ubuntu01
+[root@host01 Docker]# docker container stats Ubuntu01
+[root@host01 Docker]# docker system events
+[root@host01 Docker]# docker container kill Ubuntu01 Ubuntu02
+[root@host01 Docker]# docker container rm Ubuntu01 Ubuntu02
+
+
+All container lifecycle operations (rename, pause, restart, stats, delete) completed successfully.
+
+
+==================================================================================================================================
+18. DockerHub Repository Setup
+
+
+[root@host01 Docker]# docker login
+Username: bobhatevishal
+Password: 
+Login Succeeded
+[root@host01 Docker]# docker tag ubuntu-nginx:v1 bobhatevishal/ubuntu-nginx-vishal:v1
+[root@host01 Docker]# docker push bobhatevishal/ubuntu-nginx-vishal:v1
+
+
