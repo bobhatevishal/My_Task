@@ -14,7 +14,7 @@ create_vhost() {
         echo "Error: Please run this script as root."
         exit 1
 
-    elif ["$1" ]; then
+    elif [ $# != 1 ]; then
         echo "Usage: $0 <domain_name>"
         echo "Example: $0 example.com"
         exit 1
